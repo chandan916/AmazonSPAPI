@@ -35,7 +35,7 @@ public class AmazonSPAPIConnect {
     private final static String AWS_SECRET_KEY="";
 
 
-    public HttpEntity<MultiValueMap<String, String>> createHeaders() throws StoreException {
+    public HttpEntity<MultiValueMap<String, String>> createHeaders() {
 
                 HttpHeaders headers = new HttpHeaders();
 
