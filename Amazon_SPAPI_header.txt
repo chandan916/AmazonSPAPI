@@ -1,0 +1,101 @@
+import com.squareup.okhttp.Request;
+import org.springframework.util.LinkedMultiValueMap;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
+import com.amazon.SellingPartnerAPIAA.*;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+@Component
+public class Amazon {
+
+    private final static String x_amz_access_token_Header_Name = "x-amz-access-token" ;
+    private final static String x_amz_date_Header_Name = "x-amz-date" ;
+    private final static String x_amz_host_Header_Name = "host" ;
+    private final static String host = "sellingpartnerapi-eu.amazon.com" ;
+    private final static String x_amz_date = "20190430T123600Z" ;
+    private final static String user_agent_Header_Name = "user-agent";
+    private final static String user_agent= "";
+    private final static String MarketplaceIds="ATVPDKIKX0DER";
+    private final static String CreatedAfter="TEST_CASE_200";
+    private final static String authDomain="https://api.amazon.com/auth/o2/token";
+    private final static String roleSessionName="Test";
+    private final static String roleArn="";
+    private final static String AWS_REGION="eu-west-1";
+    private final static String AWS_ACCESS_KEY_ID="";
+    private final static String AWS_SECRET_KEY="";
+
+
+    public HttpEntity<MultiValueMap<String, String>> createHeaders() throws StoreException {
+
+                HttpHeaders headers = new HttpHeaders();
+
+                headers.setContentType(MediaType.APPLICATION_JSON);
+
+                headers.set(x_amz_access_token_Header_Name, this.getAccessToken());
+                headers.set(x_amz_date_Header_Name, x_amz_date);
+                headers.set(user_agent_Header_Name, user_agent);
+                headers.set(x_amz_host_Header_Name, host);
+
+                return new HttpEntity<>(headers);
+
+    }
+
+    public AWSSigV4Signer awsCredentialsProvider() throws IOException {
+
+        AWSAuthenticationCredentials awsAuthenticationCredentials=AWSAuthenticationCredentials.builder()
+                .accessKeyId(AWS_ACCESS_KEY_ID)
+                .secretKey(AWS_SECRET_KEY)
+                .region(AWS_REGION)
+                .build();
+
+        AWSAuthenticationCredentialsProvider awsAuthenticationCredentialsProvider=AWSAuthenticationCredentialsProvider.builder()
+                .roleArn(roleArn)
+                .roleSessionName(roleSessionName)
+                .build();
+
+        return new AWSSigV4Signer(awsAuthenticationCredentials,awsAuthenticationCredentialsProvider);
+    }
+
+    public LWAAuthorizationCredentials getAuthTokens(){
+        return LWAAuthorizationCredentials.builder()
+                .clientId(this.getClientId)
+                .clientSecret(this.getClientSecretId)
+                .refreshToken(this.getRefreshToken())
+                .endpoint(authDomain)
+                .build();
+    }
+
+    public HttpEntity <Map<String, Object>> getAmazonEntity() throws IOException {
+
+         Request request = new Request.Builder()
+                .url(https://sellingpartnerapi-eu.amazon.com/catalog/v0/items)
+                .method("GET", null)
+                .build();        
+
+         request=new LWAAuthorizationSigner(this.getAuthTokens()).sign(request);
+
+        AWSSigV4Signer awsSigV4Signer=this.awsCredentialsProvider();
+
+        request=awsSigV4Signer.sign(request);
+
+        Map<String,List<String>> header=request.headers().toMultimap();
+
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>(header);
+
+        return new HttpEntity <>(null,multiValueMap);
+
+    }
+
+ 
+
+}
