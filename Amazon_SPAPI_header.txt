@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class Amazon {
+
+public class AmazonSPAPIConnect {
 
     private final static String x_amz_access_token_Header_Name = "x-amz-access-token" ;
     private final static String x_amz_date_Header_Name = "x-amz-date" ;
@@ -41,7 +41,7 @@ public class Amazon {
 
                 headers.setContentType(MediaType.APPLICATION_JSON);
 
-                headers.set(x_amz_access_token_Header_Name, this.getAccessToken());
+                headers.set(x_amz_access_token_Header_Name, Your_Amazon_Access_Token);
                 headers.set(x_amz_date_Header_Name, x_amz_date);
                 headers.set(user_agent_Header_Name, user_agent);
                 headers.set(x_amz_host_Header_Name, host);
@@ -68,9 +68,9 @@ public class Amazon {
 
     public LWAAuthorizationCredentials getAuthTokens(){
         return LWAAuthorizationCredentials.builder()
-                .clientId(this.getClientId)
-                .clientSecret(this.getClientSecretId)
-                .refreshToken(this.getRefreshToken())
+                .clientId(Your_Amazon_Client_Id)
+                .clientSecret(Your_Amazon_client_secret_id)
+                .refreshToken(Your_Amazon_refresh_token)
                 .endpoint(authDomain)
                 .build();
     }
@@ -78,7 +78,7 @@ public class Amazon {
     public HttpEntity <Map<String, Object>> getAmazonEntity() throws IOException {
 
          Request request = new Request.Builder()
-                .url(https://sellingpartnerapi-eu.amazon.com/catalog/v0/items)
+                .url("https://sellingpartnerapi-eu.amazon.com/catalog/v0/items")
                 .method("GET", null)
                 .build();        
 
